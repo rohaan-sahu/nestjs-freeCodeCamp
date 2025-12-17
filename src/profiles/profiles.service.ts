@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { CreateProfileDto } from './dto/create-profile.dto';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
 import { retry } from 'rxjs';
+import { NOTFOUND } from 'node:dns';
 
 @Injectable()
 export class ProfilesService {
@@ -29,9 +30,14 @@ export class ProfilesService {
     };
 
     findOne(id: string){
-        return this.profiles.find((profile)=>{
+        const matchingProfile = this.profiles.find((profile)=>{
             return profile.id === id
-        })
+        });
+
+        if(!matchingProfile){
+            throw new Error(`Profile with id: ${id} not found`);
+        }
+        return matchingProfile;
     }
 
     create(person:CreateProfileDto){
@@ -45,18 +51,18 @@ export class ProfilesService {
     }
 
     update(id: string,updatePerson:UpdateProfileDto){
-        const a = this.profiles.find((profile)=>{
+        const matchingProfile = this.profiles.find((profile)=>{
             return profile.id == id
         });
 
-        if (!a) {
-            return{}
+        if (!matchingProfile) {
+            throw new Error(`Profile with id: ${id} not found`)
         }
 
-        a.name = updatePerson.name? updatePerson.name : a.name;
-        a.description = updatePerson.description? updatePerson.description : a.description;
+        matchingProfile.name = updatePerson.name? updatePerson.name : matchingProfile.name;
+        matchingProfile.description = updatePerson.description? updatePerson.description : matchingProfile.description;
 
-        this.profiles.push(a)
+        this.profiles.push(matchingProfile)
         return this.profiles
     }
 
@@ -65,10 +71,11 @@ export class ProfilesService {
             return profile.id === id
         });
 
-        if (idRemoveProfile > -1) {
-            this.profiles.splice(idRemoveProfile,1)
-            return this.profiles
+        if (idRemoveProfile === -1) {
+            throw new Error(`Profile with id: ${id} not found`)        
         }
-        return {}
+        
+        this.profiles.splice(idRemoveProfile,1)
+        return this.profiles;
     }
 }

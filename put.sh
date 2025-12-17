@@ -1,7 +1,8 @@
 #! /bin/bash
 
-curl -X PUT http://localhost:3000/profiles/c864853b-f76f-4fd5-a5d3-8cd50fa3c779 \
+curl -X PUT http://localhost:3000/profiles/efd6980d-c1ac-4261-a201-56418407c139 \
 	-H "Content-type: application/json" \
 	-d '{
-			"description": "Some random text"
+			"name": "Ka",
+			"description": "Hello  World"
 }' | jq '.'

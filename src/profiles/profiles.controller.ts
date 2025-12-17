@@ -1,8 +1,11 @@
-import { Controller, Get, Query, Param, Post, Body, Put} from '@nestjs/common';
-import { Delete,HttpCode,HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Body, Put,} from '@nestjs/common';
+import { ParseUUIDPipe,UseGuards} from "@nestjs/common"
+import { Delete,HttpCode,HttpStatus, NotFoundException } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfilesService } from './profiles.service';
+import { ProfilesGuard } from './profiles.guard';
+import { UUID } from 'node:crypto';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -15,25 +18,42 @@ export class ProfilesController {
 	}
 	//GET /profiles/:id
 	@Get(':id')
-	findOne( @Param('id') id:string ){
-		return this.profileService.findOne(id);
+	findOne( @Param('id',ParseUUIDPipe) id: UUID ){
+		try{
+			return this.profileService.findOne(id);
+		}catch(error){
+			throw new NotFoundException(error.message);
+		}
 	};
 	//POST /profiles
 	@Post()
 	create(@Body() createProfileDto: CreateProfileDto){
-		return this.profileService.create(createProfileDto)
+		try{
+			return this.profileService.create(createProfileDto)
+		}catch(error){
+			throw new Error(error.message);
+		}
 	};
 	//PUT /profiles/id:
 	@Put(':id')
 	update(
-		@Param('id') id: string,
+		@Param('id',ParseUUIDPipe) id: UUID,
 		@Body() updateProfileDto:UpdateProfileDto){
-		return this.profileService.update(id,updateProfileDto)
+			try{	
+				return this.profileService.update(id,updateProfileDto)
+			}catch(error){
+				throw new NotFoundException(error.message)
+			};
 	};
 	//DELETE /profiles/id:
 	@Delete(':id')
+	@UseGuards(ProfilesGuard)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	remove(@Param('id') id:string){
-		return this.profileService.remove(id)
+	remove(@Param('id',ParseUUIDPipe) id: UUID){
+		try{
+			return this.profileService.remove(id)
+		}catch(error){
+			throw new NotFoundException(error.message);
+		}
 	};
 }
