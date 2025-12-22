@@ -7,7 +7,7 @@
 
   
 <p align="center">
-  <a href="https://x.com/RhnSh5465" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Rohaan on X"></a>
+  <a href="https://x.com/RhnSh5465" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=RhnSh5465" alt="Rohaan on X"></a>
 </p>
 
 ## Description
